@@ -1,6 +1,8 @@
 # Dating App with LLM Matcher
 
-#### Install Python 3.12
+A Backend Oriented project which its server uses the FastAPI framework & the client uses click.
+
+### Install Python 3.12
 
 ```bash
 # This works for macOS
@@ -13,7 +15,14 @@
     eval "$(pyenv virtualenv-init -)"
 ```
 
-#### Create Virtual Environment
+### Create Virtual Environment
+
+##### Need to create virtual environment on both apps in the next paths:
+
+1. `{PROJECT_PATH}/backend`
+2. `{PROJECT_PATH}/client`
+
+after running those commands there will be a ".venv" within the mentioned paths
 
 ```bash
 > pyenv local 3.12.2 # use python 3.12
@@ -22,29 +31,47 @@
 > poetry shell # activate venv
 ```
 
-#### Install Dev Dependencies
+### Install Dev Dependencies
 
 ```bash
 > poetry install -vvvv
 > poetry show # show project packages
 ```
 
-#### Run Dev Utils ( Linter, Formatter & Type Checker - configuration in pyproject.toml)
+### Run Dev Utils ( Linter, Formatter & Type Checker - configuration in pyproject.toml)
 
 ```bash
 # Linter
-> poetry run ruff check .
+> cd {PROJECT_PATH}/backend && poetry run ruff check .
 # Formatter
-> poetry run ruff format .
+> cd {PROJECT_PATH}/backend && poetry run ruff format .
 # Type Checker
-> poetry run mypy . --explicit-package-bases
+> cd {PROJECT_PATH}/backend && poetry run mypy ./app --explicit-package-bases
 ```
 
-#### Run Application
+### Run The Applications
 
-1. Navigate to `backend` where there are all the python modules
-   Navigate to the parent directory of `backend` where the docker files.
+#### Server:
 
 ```bash
-poetry run python3 app.py
+cd {PROJECT_PATH}/backend && poetry run python app/main.py
+```
+
+#### Client:
+
+Open 2 terminals and make sure to follow this procedure's pattern:
+tab 1:
+
+```bash
+1. cd {PROJECT_PATH}/client
+2. poetry run python3 app/main.py register --user-id naty --name naty --description king
+3. poetry run python3 app/main.py chat --user-id naty --preferences queen
+```
+
+tab 2:
+
+```bash
+1. cd {PROJECT_PATH}/client
+2. poetry run python3 app/main.py register --user-id nofar --name nofar --description queen
+3. poetry run python3 app/main.py chat --user-id nofar --preferences king
 ```
