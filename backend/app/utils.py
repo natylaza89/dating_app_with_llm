@@ -17,8 +17,9 @@ def __get_user_match_info(state_manager: StateManager, match_id: UserID) -> Pote
     if not user_info:
         return None
 
-    user_info["match_id"] = match_id
-    return user_info
+    user_metadata = user_info.model_dump()
+    user_metadata["match_id"] = match_id
+    return user_metadata
 
 
 def __mocked_llm_potential_matches(user_id: UserID, preferences: str, users: Users) -> PotentialMatch:
@@ -26,8 +27,8 @@ def __mocked_llm_potential_matches(user_id: UserID, preferences: str, users: Use
         other_id
         for other_id, other_user in users.items()
         if other_id != user_id and (
-                preferences.lower() in other_user["description"].lower() or
-                other_user["description"].lower() in preferences.lower()
+                preferences.lower() in other_user.description.lower() or
+                other_user.description.lower() in preferences.lower()
         )
     ]
 

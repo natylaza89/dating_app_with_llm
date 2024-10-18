@@ -1,6 +1,5 @@
 venv
 .idea
-workfile.csv
 .env
 __pycache__/
 *.pyc
@@ -12,3 +11,5 @@ brew
 test-reports/
 .venv*
 .vscode
+.mypy_cache
+.ruff_cache

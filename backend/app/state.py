@@ -1,7 +1,7 @@
 from fastapi import WebSocket
 
 from app.models import User
-from app.custom_types import UserID, Users, ChatID, ActiveChats, MatchedPairs
+from app.custom_types import UserID, Users, ChatID, ActiveChat, ActiveChats, MatchedPairs
 from app.config import settings
 
 
@@ -20,8 +20,8 @@ class StateManager:
             # TODO: add the user description into a vectoring in memory db
             pass
 
-    def get_user(self, user_id: UserID) -> User | dict:
-        return self._users.get(user_id, {})
+    def get_user(self, user_id: UserID) -> User | None:
+        return self._users.get(user_id)
 
     def get_chat_id_from_matched_pairs(self, user_id: UserID, match_id: UserID) -> ChatID | None:
         return self._matched_pairs.get((user_id,match_id)) or  self._matched_pairs.get((match_id, user_id))
@@ -32,8 +32,8 @@ class StateManager:
     def set_matched_pairs(self, user_id: UserID, match_id: UserID, chat_id: ChatID) -> None:
         self._matched_pairs[(user_id, match_id)] = chat_id
 
-    def get_active_chat(self, chat_id: ChatID) -> ActiveChats | None:
-        return self._active_chats.get(chat_id)
+    def get_active_chat(self, chat_id: ChatID) -> ActiveChat:
+        return self._active_chats[chat_id]
 
     def set_active_chats(self, chat_id: ChatID, websocket: WebSocket) -> None:
         if chat_id not in self._active_chats:
