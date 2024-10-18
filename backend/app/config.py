@@ -1,10 +1,9 @@
 import os
 from typing import ClassVar
 
-from dotenv import load_dotenv
 from pydantic_settings import BaseSettings
+from pydantic import ConfigDict
 
-load_dotenv()
 
 class Settings(BaseSettings):
     environment: str = os.environ.get("ENV", "dev")
@@ -17,13 +16,13 @@ class Settings(BaseSettings):
         else {}
     )
     app_string: str = "app.main:app"
-    mock_llm: bool =  bool(os.environ.get("MOCK_LLM", "0"))
+    mock_llm: bool = bool(os.environ.get("MOCK_LLM", "0"))
 
-    class Config:
-        env_nested_delimiter = "__"
-        arbitrary_types_allowed = True
-        extra = "ignore"
-        env_file = "../.env" if os.getenv("ENV", "dev") == "dev" and os.path.exists("../.env") else ".env"
-
+    model_config = ConfigDict(
+        env_nested_delimiter="__",
+        arbitrary_types_allowed=True,
+        extra="ignore",
+        env_file=("../.env" if os.getenv("ENV", "dev") == "dev" and os.path.exists("../.env") else ".env")
+    )
 
 settings = Settings()
