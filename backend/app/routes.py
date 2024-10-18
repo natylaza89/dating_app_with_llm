@@ -14,7 +14,7 @@ async def register(user: User):
     if user.id in state_manager.get_users():
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="User already exists")
 
-    state_manager.set_user(user.id, user.model_dump())
+    state_manager.set_user(user.id, user)
     return JSONResponse(content={"message": "User registered successfully"})
 
 
