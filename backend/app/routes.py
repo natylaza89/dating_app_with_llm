@@ -15,7 +15,7 @@ async def register(user: User):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="User already exists")
 
     state_manager.set_user(user.id, user)
-    return JSONResponse(content={"message": "User registered successfully"})
+    return JSONResponse(content={"message": "User registered successfully"}, status_code=status.HTTP_201_CREATED)
 
 
 @router.post("/match", response_model=MatchResponse, status_code=status.HTTP_200_OK)
