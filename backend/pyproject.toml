@@ -3,6 +3,9 @@ name = "dating-app-backend"
 version = "0.0.1"
 description = "Dating App LLM Matcher"
 authors = ["Naty Laza"]
+packages = [
+    { include = "app" },
+]
 
 [tool.poetry.dependencies]
 python = "^3.12"
