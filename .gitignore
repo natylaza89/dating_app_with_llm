@@ -1,0 +1,14 @@
+venv
+.idea
+workfile.csv
+.env
+__pycache__/
+*.pyc
+.DS_Store
+env
+brew
+.coverage
+.coverage.*
+test-reports/
+.venv*
+.vscode
