@@ -1,0 +1,54 @@
+from fastapi import WebSocket
+
+from app.models import User
+from app.custom_types import UserID, Users, ChatID, ActiveChats, MatchedPairs
+from app.config import settings
+
+
+class StateManager:
+    def __init__(self) -> None:
+        self._users: Users = {}
+        self._active_chats: ActiveChats = {}
+        self._matched_pairs: MatchedPairs = {}
+
+    def get_users(self) -> Users:
+        return self._users
+
+    def set_user(self, user_id: UserID, user: User) -> None:
+        self._users[user_id] = user
+        if not settings.mock_llm:
+            # TODO: add the user description into a vectoring in memory db
+            pass
+
+    def get_user(self, user_id: UserID) -> User | dict:
+        return self._users.get(user_id, {})
+
+    def get_chat_id_from_matched_pairs(self, user_id: UserID, match_id: UserID) -> ChatID | None:
+        return self._matched_pairs.get((user_id,match_id)) or  self._matched_pairs.get((match_id, user_id))
+
+    def get_all_matched_pairs(self) -> MatchedPairs:
+        return self._matched_pairs
+
+    def set_matched_pairs(self, user_id: UserID, match_id: UserID, chat_id: ChatID) -> None:
+        self._matched_pairs[(user_id, match_id)] = chat_id
+
+    def get_active_chat(self, chat_id: ChatID) -> ActiveChats | None:
+        return self._active_chats.get(chat_id)
+
+    def set_active_chats(self, chat_id: ChatID, websocket: WebSocket) -> None:
+        if chat_id not in self._active_chats:
+            self._active_chats[chat_id] = []
+        self._active_chats[chat_id].append(websocket)
+
+    def delete_chat_from_active_chats(self, chat_id_to_delete: ChatID, websocket: WebSocket) -> None:
+        self._active_chats[chat_id_to_delete].remove(websocket)
+        if not self._active_chats[chat_id_to_delete]:
+            del self._active_chats[chat_id_to_delete]
+            # Remove the chat_id from matched_pairs
+            self._matched_pairs = {
+                matched_pair: chat_id
+                for matched_pair,chat_id in self._matched_pairs.items()
+                if chat_id != chat_id_to_delete
+            }
+
+state_manager = StateManager()
