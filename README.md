@@ -59,8 +59,9 @@ cd {PROJECT_PATH}/backend && poetry run python app/main.py
 
 #### Client:
 
-Open 2 terminals and make sure to follow this procedure's pattern:
-tab 1:
+1. Make sure to get an api key from [CoHere](https://cohere.com/) & update .env File - if you choose not to configure in .env the `MOCK_LLM=true`
+2. Open 2 terminals and make sure to follow this procedure's pattern:
+   tab 1:
 
 ```bash
 1. cd {PROJECT_PATH}/client

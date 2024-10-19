@@ -13,3 +13,4 @@ MatchedPairs = dict[tuple[UserID,UserID], ChatID]
 Embedding = list[float]
 UsersEmbeddings = dict[UserID, Embedding]
 BestMatchScore = float
+SimilarityScore = float

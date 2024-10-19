@@ -63,7 +63,6 @@ class StateManager:
 
     def set_user_embeddings(self, user_id: UserID, embedding):
         self._user_embeddings[user_id] = embedding
-        
 
 
 state_manager = StateManager()

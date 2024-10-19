@@ -2,40 +2,49 @@ from unittest.mock import patch
 
 import pytest
 
-from app.utils import find_potential_matches, create_chat_for_matched_users
-from app.models import User
-from tests.mocked_data import USER1, USER2, USER3, CHAT_ID
+from app.utils import find_potential_match, create_chat_for_matched_users
+from tests.mocked_data import USER1, USER2, USER3, CHAT_ID, USERS_EMBEDDINGS, QUERY_EMBEDDINGS
 
 
 @pytest.fixture
 def mock_state_manager():
     with patch("app.utils.state_manager") as mock:
+        mock.get_users.return_value = {
+            USER1.id: USER1,
+            USER2.id: USER2,
+            USER3.id: USER3,
+        }
+        mock.get_user.return_value = USER3
+        mock.get_users_embedings.return_value = USERS_EMBEDDINGS
+
         yield mock
 
 
 def test_find_potential_matches_mock_llm(mock_settings, mock_state_manager):
     mock_settings.mock_llm = True
-    mock_state_manager.get_user.return_value = USER3
-    mock_state_manager._users = {
-        USER1.id: USER1,
-        USER2.id: USER2,
-        USER3.id: USER3,
-    }
 
-    users = mock_state_manager._users
-    match = find_potential_matches(USER1.id, "the queen", users)
+    users = mock_state_manager.get_users()
+    match = find_potential_match(USER1.id, "the queen", users)
 
     assert match is not None
-    assert match["match_id"] in [USER2.id, USER3.id]  # It should not match with "1"
+    assert match["match_id"] in [USER2.id, USER3.id]
 
-    match = find_potential_matches(USER1.id, "coffee maker", users)
+    match = find_potential_match(USER1.id, "coffee maker", users)
     assert match is None
 
 
-# TODO:
-# def test_find_potential_matches_real_llm(mock_settings):
-#     mock_settings.mock_llm = False
+def test_find_potential_matches_real_llm(mock_settings, mock_state_manager):
+    mock_settings.mock_llm = False
+    users = mock_state_manager.get_users()
 
+    with patch("app.utils.get_embeddings", return_value=QUERY_EMBEDDINGS):
+        match = find_potential_match(USER1.id, "the queen", users)
+        assert match is not None
+        assert match["match_id"] in [USER2.id, USER3.id]
+    
+    with patch("app.utils.get_embeddings", return_value=None):
+        match = find_potential_match(USER1.id, "coffee maker", users)
+        assert match is None
 
 
 def test_create_chat_for_matched_users(mock_state_manager):

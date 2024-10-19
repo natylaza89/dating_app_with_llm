@@ -9,19 +9,19 @@ from tests.mocked_data import USER1 as USER, USER2 as MATCHED_USER, CHAT_ID
 
 @pytest.fixture
 def mock_state_manager():
-    with patch('app.routes.state_manager') as mock:
+    with patch("app.routes.state_manager") as mock:
         yield mock
 
 
 @pytest.fixture
 def mock_find_potential_matches():
-    with patch('app.routes.find_potential_matches') as mock:
+    with patch("app.routes.find_potential_match") as mock:
         yield mock
 
 
 @pytest.fixture
 def mock_create_chat_for_matched_users():
-    with patch('app.routes.create_chat_for_matched_users') as mock:
+    with patch("app.routes.create_chat_for_matched_users") as mock:
         yield mock
 
 

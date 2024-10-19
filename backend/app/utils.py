@@ -6,7 +6,7 @@ import numpy as np
 
 from app.config import settings
 from app.state import state_manager, StateManager
-from app.custom_types import UserID, Users, ChatID, PotentialMatch, Embedding, UsersEmbeddings, BestMatchScore
+from app.custom_types import UserID, Users, ChatID, PotentialMatch, Embedding, UsersEmbeddings, BestMatchScore, SimilarityScore
 from app.embeddings import get_embeddings
 
 _logger = logging.getLogger(__name__)
@@ -15,7 +15,7 @@ _logger = logging.getLogger(__name__)
 def find_potential_match(user_id: UserID, preferences: str, users: Users) -> PotentialMatch:
     if settings.mock_llm:
         return __mocked_llm_potential_match(user_id, preferences, users)
-    return __llm_potential_match(user_id, preferences, users)
+    return __llm_potential_match(user_id, preferences)
 
 
 def __get_user_match_info(state_manager: StateManager, match_id: UserID) -> PotentialMatch:
@@ -48,13 +48,12 @@ def __mocked_llm_potential_match(user_id: UserID, preferences: str, users: Users
     ])
 
 
-def __llm_potential_match(user_id: UserID, preferences: str, users: Users) -> PotentialMatch:
+def __llm_potential_match(user_id: UserID, preferences: str) -> PotentialMatch:
         user_description = state_manager.get_user(user_id).description
         query = f"User Description: {user_description}\nPreferences: {preferences}"
         try:
             query_embedding = get_embeddings(query)
             if query_embedding is None:
-                # TODO: make sure to capture it via the endpoint and return 500
                 raise ValueError("Failed to get query embedding")
 
             other_embeddings = {}
@@ -71,10 +70,9 @@ def __llm_potential_match(user_id: UserID, preferences: str, users: Users) -> Po
             return None
 
 
-# TODO: make this more readable & give good names + """ explanation """"
-def cosine_similarity(v1: Embedding, v2: Embedding) -> float:
+def cosine_similarity(v1: Embedding, v2: Embedding) -> SimilarityScore:
+    """ Calculate the similarity between two embedding vectors """
     return np.dot(v1, v2) / (np.linalg.norm(v1) * np.linalg.norm(v2))
-
 
 
 def find_best_match(query_embedding: Embedding, other_embeddings: UsersEmbeddings) -> tuple[UserID, BestMatchScore]:
@@ -82,12 +80,13 @@ def find_best_match(query_embedding: Embedding, other_embeddings: UsersEmbedding
     best_similarity = -1
 
     for other_id, other_embedding in other_embeddings.items():
-        similarity = cosine_similarity(query_embedding, other_embedding)
+        similarity: SimilarityScore = cosine_similarity(query_embedding, other_embedding)
         if similarity > best_similarity:
             best_similarity = similarity
             best_match_id = other_id
 
     return best_match_id, best_similarity
+
 
 def create_chat_for_matched_users(user_id: UserID, match_id: UserID) -> ChatID:
     existing_chat_id = (
