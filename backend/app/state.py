@@ -1,7 +1,7 @@
 from fastapi import WebSocket
 
 from app.models import User
-from app.custom_types import UserID, Users, ChatID, ActiveChat, ActiveChats, MatchedPairs
+from app.custom_types import UserID, Users, ChatID, ActiveChat, ActiveChats, MatchedPairs, UsersEmbeddings
 from app.config import settings
 from app.embeddings import get_embeddings
 
@@ -11,7 +11,7 @@ class StateManager:
         self._users: Users = {}
         self._active_chats: ActiveChats = {}
         self._matched_pairs: MatchedPairs = {}
-        self._user_embeddings = {}
+        self._user_embeddings: UsersEmbeddings = {}
 
     def get_users(self) -> Users:
         return self._users
