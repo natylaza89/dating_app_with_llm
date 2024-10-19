@@ -3,7 +3,7 @@ from fastapi.responses import JSONResponse
 
 from app.state import state_manager
 from app.models import User, MatchResponse, MatchRequest
-from app.utils import find_potential_matches, create_chat_for_matched_users
+from app.utils import find_potential_match, create_chat_for_matched_users
 
 
 router = APIRouter()
@@ -27,7 +27,7 @@ async def match(request: MatchRequest):
     retries = 3
     potential_match = None
     while retries > 0 and not potential_match:
-        potential_match = find_potential_matches(request.user_id, request.preferences, users)
+        potential_match = find_potential_match(request.user_id, request.preferences, users)
         retries -= 1
 
     if not potential_match:

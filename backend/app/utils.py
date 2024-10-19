@@ -1,15 +1,21 @@
+import logging
 import random
 import uuid
 
+import numpy as np
+
 from app.config import settings
 from app.state import state_manager, StateManager
-from app.custom_types import UserID, Users, ChatID, PotentialMatch
+from app.custom_types import UserID, Users, ChatID, PotentialMatch, Embedding, UsersEmbeddings, BestMatchScore, SimilarityScore
+from app.embeddings import get_embeddings
+
+_logger = logging.getLogger(__name__)
 
 
-def find_potential_matches(user_id: UserID, preferences: str, users: Users) -> PotentialMatch:
+def find_potential_match(user_id: UserID, preferences: str, users: Users) -> PotentialMatch:
     if settings.mock_llm:
-        return __mocked_llm_potential_matches(user_id, preferences, users)
-    return __llm_potential_matches(user_id, preferences, users)
+        return __mocked_llm_potential_match(user_id, preferences, users)
+    return __llm_potential_match(user_id, preferences)
 
 
 def __get_user_match_info(state_manager: StateManager, match_id: UserID) -> PotentialMatch:
@@ -22,7 +28,7 @@ def __get_user_match_info(state_manager: StateManager, match_id: UserID) -> Pote
     return user_metadata
 
 
-def __mocked_llm_potential_matches(user_id: UserID, preferences: str, users: Users) -> PotentialMatch:
+def __mocked_llm_potential_match(user_id: UserID, preferences: str, users: Users) -> PotentialMatch:
     potential_matches = [
         other_id
         for other_id, other_user in users.items()
@@ -42,8 +48,44 @@ def __mocked_llm_potential_matches(user_id: UserID, preferences: str, users: Use
     ])
 
 
-def __llm_potential_matches(user_id: UserID, preferences: str, users: Users) -> PotentialMatch:
-    return None
+def __llm_potential_match(user_id: UserID, preferences: str) -> PotentialMatch:
+        user_description = state_manager.get_user(user_id).description
+        query = f"User Description: {user_description}\nPreferences: {preferences}"
+        try:
+            query_embedding = get_embeddings(query)
+            if query_embedding is None:
+                raise ValueError("Failed to get query embedding")
+
+            other_embeddings = {}
+            for other_id, other_embedding in state_manager.get_users_embedings().items():
+                if other_id != user_id:
+                    other_embeddings[other_id] = other_embedding
+
+            best_match_id, similarity = find_best_match(query_embedding, other_embeddings)
+            _logger.debug(f"Best match user_id: {best_match_id}, similarity: {similarity}")
+
+            return __get_user_match_info(state_manager, best_match_id)
+        except Exception as e:
+            _logger.error(f"Error finding top match: {e}")
+            return None
+
+
+def cosine_similarity(v1: Embedding, v2: Embedding) -> SimilarityScore:
+    """ Calculate the similarity between two embedding vectors """
+    return np.dot(v1, v2) / (np.linalg.norm(v1) * np.linalg.norm(v2))
+
+
+def find_best_match(query_embedding: Embedding, other_embeddings: UsersEmbeddings) -> tuple[UserID, BestMatchScore]:
+    best_match_id = None
+    best_similarity = -1
+
+    for other_id, other_embedding in other_embeddings.items():
+        similarity: SimilarityScore = cosine_similarity(query_embedding, other_embedding)
+        if similarity > best_similarity:
+            best_similarity = similarity
+            best_match_id = other_id
+
+    return best_match_id, best_similarity
 
 
 def create_chat_for_matched_users(user_id: UserID, match_id: UserID) -> ChatID:
