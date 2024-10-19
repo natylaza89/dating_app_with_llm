@@ -20,6 +20,6 @@ if __name__ == "__main__":
         app=settings.app_string,
         host="0.0.0.0",
         port=8989,
-        reload=settings.environment == "dev",
+        reload=settings.app_env == "dev",
     )
 

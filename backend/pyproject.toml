@@ -15,9 +15,11 @@ build-backend = "poetry.core.masonry.api"
 python = "^3.12"
 uvicorn = "^0.23.2"
 pydantic = "^2.3.0"
-python-dotenv = "^1.0.0"
 fastapi = {extras = ["standard"], version = "^0.115.2"}
 pydantic-settings = "^2.5.2"
+cohere = "^5.11.1"
+python-dotenv = "^1.0.1"
+numpy = "^2.1.2"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "~8.2.0"

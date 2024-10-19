@@ -3,6 +3,7 @@ from fastapi import WebSocket
 from app.models import User
 from app.custom_types import UserID, Users, ChatID, ActiveChat, ActiveChats, MatchedPairs
 from app.config import settings
+from app.embeddings import get_embeddings
 
 
 class StateManager:
@@ -10,6 +11,7 @@ class StateManager:
         self._users: Users = {}
         self._active_chats: ActiveChats = {}
         self._matched_pairs: MatchedPairs = {}
+        self._user_embeddings = {}
 
     def get_users(self) -> Users:
         return self._users
@@ -17,8 +19,10 @@ class StateManager:
     def set_user(self, user_id: UserID, user: User) -> None:
         self._users[user_id] = user
         if not settings.mock_llm:
-            # TODO: add the user description into a vectoring in memory db
-            pass
+            self.set_user_embeddings(
+                user.id,
+                embedding=get_embeddings(text=user.description)
+            )
 
     def get_user(self, user_id: UserID) -> User | None:
         return self._users.get(user_id)
@@ -50,5 +54,16 @@ class StateManager:
                 for matched_pair,chat_id in self._matched_pairs.items()
                 if chat_id != chat_id_to_delete
             }
+
+    def get_users_embedings(self):
+        return self._user_embeddings
+
+    def get_user_embeddings(self, user_id: UserID):
+        return self._user_embeddings[user_id]
+
+    def set_user_embeddings(self, user_id: UserID, embedding):
+        self._user_embeddings[user_id] = embedding
+        
+
 
 state_manager = StateManager()
