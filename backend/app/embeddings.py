@@ -24,6 +24,11 @@ def get_embeddings(text: str) -> Optional[Embedding]:
             model="embed-english-v3.0",
             truncate="END"
         )
-        return response.embeddings.float_[0]
+        embeddings = response.embeddings
+        if not embeddings or not hasattr(embeddings, 'float_') or not embeddings.float_:
+            _logger.warning("Embeddings value from Cohere has invalid value.")
+            return None
+        return embeddings.float_[0]
     except Exception as e:
         _logger.error(f"Error getting embedding: {e}")
+        return None

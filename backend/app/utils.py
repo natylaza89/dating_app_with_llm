@@ -1,6 +1,7 @@
 import logging
 import random
 import uuid
+from typing import Optional
 
 import numpy as np
 
@@ -8,6 +9,7 @@ from app.config import settings
 from app.state import state_manager, StateManager
 from app.custom_types import UserID, Users, ChatID, PotentialMatch, Embedding, UsersEmbeddings, BestMatchScore, SimilarityScore
 from app.embeddings import get_embeddings
+
 
 _logger = logging.getLogger(__name__)
 
@@ -49,8 +51,11 @@ def __mocked_llm_potential_match(user_id: UserID, preferences: str, users: Users
 
 
 def __llm_potential_match(user_id: UserID, preferences: str) -> PotentialMatch:
-        user_description = state_manager.get_user(user_id).description
-        query = f"User Description: {user_description}\nPreferences: {preferences}"
+        user = state_manager.get_user(user_id) 
+        if user is None:
+            raise ValueError("User is missing")
+
+        query = f"User Description: {user.description}\nPreferences: {preferences}"
         try:
             query_embedding = get_embeddings(query)
             if query_embedding is None:
@@ -62,6 +67,9 @@ def __llm_potential_match(user_id: UserID, preferences: str) -> PotentialMatch:
                     other_embeddings[other_id] = other_embedding
 
             best_match_id, similarity = find_best_match(query_embedding, other_embeddings)
+            if not best_match_id:
+                return None
+
             _logger.debug(f"Best match user_id: {best_match_id}, similarity: {similarity}")
 
             return __get_user_match_info(state_manager, best_match_id)
@@ -75,9 +83,9 @@ def cosine_similarity(v1: Embedding, v2: Embedding) -> SimilarityScore:
     return np.dot(v1, v2) / (np.linalg.norm(v1) * np.linalg.norm(v2))
 
 
-def find_best_match(query_embedding: Embedding, other_embeddings: UsersEmbeddings) -> tuple[UserID, BestMatchScore]:
-    best_match_id = None
-    best_similarity = -1
+def find_best_match(query_embedding: Embedding, other_embeddings: UsersEmbeddings) -> tuple[Optional[UserID], BestMatchScore]:
+    best_match_id: Optional[UserID] = None
+    best_similarity = -1.0
 
     for other_id, other_embedding in other_embeddings.items():
         similarity: SimilarityScore = cosine_similarity(query_embedding, other_embedding)
