@@ -32,3 +32,14 @@ jobs:
         run: |
           cd backend
           poetry run mypy app tests
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python and dependencies
+        uses: ./.github/workflows/setup-dependencies.yml
+      - name: Run Pytest
+        run: |
+          cd backend
+          poetry run pytest tests
