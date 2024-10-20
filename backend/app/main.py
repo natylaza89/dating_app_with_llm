@@ -9,6 +9,7 @@ def init_routers(app: FastAPI):
     app.include_router(api_router, prefix=settings.api_v1_str)
     app.include_router(ws_router, prefix=settings.api_v1_str)
 
+
 app = FastAPI(title=settings.project_name, **settings.fastapi_info)
 init_routers(app)
 
