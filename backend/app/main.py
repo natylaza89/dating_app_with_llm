@@ -22,4 +22,3 @@ if __name__ == "__main__":
         port=8989,
         reload=settings.app_env == "dev",
     )
-

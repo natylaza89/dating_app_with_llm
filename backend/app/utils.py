@@ -51,12 +51,12 @@ def __mocked_llm_potential_match(user_id: UserID, preferences: str, users: Users
 
 
 def __llm_potential_match(user_id: UserID, preferences: str) -> PotentialMatch:
-        user = state_manager.get_user(user_id) 
-        if user is None:
-            raise ValueError("User is missing")
-
-        query = f"User Description: {user.description}\nPreferences: {preferences}"
         try:
+            user = state_manager.get_user(user_id) 
+            if user is None:
+                raise ValueError("User is missing")
+
+            query = f"User Description: {user.description}\nPreferences: {preferences}"
             query_embedding = get_embeddings(query)
             if query_embedding is None:
                 raise ValueError("Failed to get query embedding")
