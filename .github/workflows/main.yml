@@ -1,0 +1,34 @@
+name: Dating App CI
+
+on:
+  push:
+    paths:
+      - "backend/app/**"
+      - "backend/tests/**"
+  pull_request:
+    paths:
+      - "backend/app/**"
+      - "backend/tests/**"
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python and dependencies
+        uses: ./.github/workflows/setup-dependencies.yml
+      - name: Run Ruff
+        run: |
+          cd backend
+          poetry run ruff check app tests
+
+  type-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python and dependencies
+        uses: ./.github/workflows/setup-dependencies.yml
+      - name: Run Mypy
+        run: |
+          cd backend
+          poetry run mypy app tests
