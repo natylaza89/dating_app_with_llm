@@ -15,9 +15,9 @@ _logger = logging.getLogger(__name__)
 
 
 def find_potential_match(user_id: UserID, preferences: str, users: Users) -> PotentialMatch:
-    if settings.mock_llm:
-        return __mocked_llm_potential_match(user_id, preferences, users)
-    return __llm_potential_match(user_id, preferences)
+    if settings.mock_semantic_similarity:
+        return __mocked_semantic_similarity_potential_match(user_id, preferences, users)
+    return __semantic_similarity_potential_match(user_id, preferences)
 
 
 def __get_user_match_info(state_manager: StateManager, match_id: UserID) -> PotentialMatch:
@@ -30,7 +30,7 @@ def __get_user_match_info(state_manager: StateManager, match_id: UserID) -> Pote
     return user_metadata
 
 
-def __mocked_llm_potential_match(user_id: UserID, preferences: str, users: Users) -> PotentialMatch:
+def __mocked_semantic_similarity_potential_match(user_id: UserID, preferences: str, users: Users) -> PotentialMatch:
     potential_matches = [
         other_id
         for other_id, other_user in users.items()
@@ -50,7 +50,7 @@ def __mocked_llm_potential_match(user_id: UserID, preferences: str, users: Users
     ])
 
 
-def __llm_potential_match(user_id: UserID, preferences: str) -> PotentialMatch:
+def __semantic_similarity_potential_match(user_id: UserID, preferences: str) -> PotentialMatch:
         try:
             user = state_manager.get_user(user_id) 
             if user is None:
