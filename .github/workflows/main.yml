@@ -12,45 +12,16 @@ on:
 
 jobs:
   setup:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Set up Python 3.12
-        uses: actions/setup-python@v4
-        with:
-          python-version: "3.12"
-      - name: Install Poetry
-        uses: snok/install-poetry@v1
-      - name: Load cached venv
-        id: cached-poetry-dependencies
-        uses: actions/cache@v3
-        with:
-          path: ~/.cache/pypoetry/virtualenvs
-          key: ${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}
-      - name: Install dependencies
-        if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
-        run: |
-          cd backend
-          poetry install
-    outputs:
-      python-version: "3.12"
+    uses: ./.github/workflows/setup-dependencies.yml
 
   lint:
     needs: setup
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - name: Set up Python 3.12
-        uses: actions/setup-python@v4
+      - uses: actions/cache@v3
         with:
-          python-version: ${{ needs.setup.outputs.python-version }}
-      - name: Install Poetry
-        uses: snok/install-poetry@v1
-      - name: Load cached venv
-        uses: actions/cache@v3
-        with:
-          path: ~/.cache/pypoetry/virtualenvs
-          key: ${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}
+          path: ${{ github.workspace }}
+          key: ${{ runner.os }}-workspace-${{ github.sha }}
       - name: Run Ruff
         run: |
           cd backend
@@ -60,18 +31,10 @@ jobs:
     needs: setup
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - name: Set up Python 3.12
-        uses: actions/setup-python@v4
+      - uses: actions/cache@v3
         with:
-          python-version: ${{ needs.setup.outputs.python-version }}
-      - name: Install Poetry
-        uses: snok/install-poetry@v1
-      - name: Load cached venv
-        uses: actions/cache@v3
-        with:
-          path: ~/.cache/pypoetry/virtualenvs
-          key: ${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}
+          path: ${{ github.workspace }}
+          key: ${{ runner.os }}-workspace-${{ github.sha }}
       - name: Run Mypy
         run: |
           cd backend
@@ -81,18 +44,10 @@ jobs:
     needs: setup
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - name: Set up Python 3.12
-        uses: actions/setup-python@v4
+      - uses: actions/cache@v3
         with:
-          python-version: ${{ needs.setup.outputs.python-version }}
-      - name: Install Poetry
-        uses: snok/install-poetry@v1
-      - name: Load cached venv
-        uses: actions/cache@v3
-        with:
-          path: ~/.cache/pypoetry/virtualenvs
-          key: ${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}
+          path: ${{ github.workspace }}
+          key: ${{ runner.os }}-workspace-${{ github.sha }}
       - name: Run Pytest
         run: |
           cd backend
