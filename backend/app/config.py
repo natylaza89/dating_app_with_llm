@@ -31,7 +31,7 @@ class Settings(BaseSettings):
 
     def model_post_init(self, __context) -> None:
         load_dotenv()
-        self.mock_llm = os.environ.get("MOCK_LLM", "").lower() in {"true", "1", "yes"}
+        self.mock_llm = os.environ.get("MOCK_LLM", "").lower() in {"True", "true"}
         self.cohere_api_key = os.environ.get("COHERE_API_KEY", "")
         
 
