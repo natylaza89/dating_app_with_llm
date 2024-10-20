@@ -11,23 +11,24 @@ on:
       - "backend/tests/**"
 
 jobs:
-  setup:
+  setup-dependencies:
     uses: ./.github/workflows/setup-dependencies.yml
 
   lint:
-    needs: setup
+    needs: setup-dependencies
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Set up Python
+      - name: Set up Python 3.12
         uses: actions/setup-python@v4
         with:
-          python-version: ${{ needs.setup.outputs.python-version }}
+          python-version: "3.12"
       - name: Install Poetry
         uses: snok/install-poetry@v1
       - name: Install dependencies
         run: |
           cd backend
+          poetry env use 3.12
           poetry install
       - name: Run Ruff
         run: |
@@ -35,19 +36,20 @@ jobs:
           poetry run ruff check app tests
 
   type-check:
-    needs: setup
+    needs: setup-dependencies
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Set up Python
+      - name: Set up Python 3.12
         uses: actions/setup-python@v4
         with:
-          python-version: ${{ needs.setup.outputs.python-version }}
+          python-version: "3.12"
       - name: Install Poetry
         uses: snok/install-poetry@v1
       - name: Install dependencies
         run: |
           cd backend
+          poetry env use 3.12
           poetry install
       - name: Run Mypy
         run: |
@@ -55,19 +57,20 @@ jobs:
           poetry run mypy app tests
 
   test:
-    needs: setup
+    needs: setup-dependencies
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Set up Python
+      - name: Set up Python 3.12
         uses: actions/setup-python@v4
         with:
-          python-version: ${{ needs.setup.outputs.python-version }}
+          python-version: "3.12"
       - name: Install Poetry
         uses: snok/install-poetry@v1
       - name: Install dependencies
         run: |
           cd backend
+          poetry env use 3.12
           poetry install
       - name: Run Pytest
         run: |

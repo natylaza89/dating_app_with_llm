@@ -16,6 +16,7 @@ jobs:
       - name: Install dependencies
         run: |
           cd backend
+          poetry env use 3.12
           poetry install
     outputs:
       python-version: "3.12"
