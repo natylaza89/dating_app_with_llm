@@ -20,8 +20,8 @@ def mock_state_manager():
         yield mock
 
 
-def test_find_potential_matches_mock_llm(mock_settings, mock_state_manager):
-    mock_settings.mock_llm = True
+def test_find_potential_matches_mock_semantic_similarity(mock_settings, mock_state_manager):
+    mock_settings.mock_semantic_similarity = True
 
     users = mock_state_manager.get_users()
     match = find_potential_match(USER1.id, "the queen", users)
@@ -33,8 +33,8 @@ def test_find_potential_matches_mock_llm(mock_settings, mock_state_manager):
     assert match is None
 
 
-def test_find_potential_matches_real_llm(mock_settings, mock_state_manager):
-    mock_settings.mock_llm = False
+def test_find_potential_matches_semantic_similarity(mock_settings, mock_state_manager):
+    mock_settings.mock_semantic_similarity = False
     users = mock_state_manager.get_users()
 
     with patch("app.utils.get_embeddings", return_value=QUERY_EMBEDDINGS):

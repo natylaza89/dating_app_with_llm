@@ -1,6 +1,14 @@
-# Dating App with LLM Matcher
+# Semantic Similarity Dating App
 
-A Backend Oriented project which its server uses the FastAPI framework & the client uses click.
+A Backend Oriented project which its server using Python 3.12, FastAPI, WebSockets, CoHere & Embeddings.
+A simple client uses Python 3.12 & click.
+
+# Future Idea/Plan - More LLM-Wise
+
+In order to make this app more LLM-wise, a few thing can be done:
+
+1. Dynamic Query Generation: Instead of directly using the user's input, the LLM creates an enhanced query that might include related concepts or implied preferences. - minimum requirement for LLM within this context.
+2. Personalized Match Explanations: The LLM generates human-like explanations for why matches might be compatible, providing users with more context and potentially increasing engagement. - additional upgrade.
 
 ### Install Python 3.12
 
@@ -59,7 +67,7 @@ cd {PROJECT_PATH}/backend && poetry run python app/main.py
 
 #### Client:
 
-1. Make sure to get an api key from [CoHere](https://cohere.com/) & update .env File - if you choose not to configure in .env the `MOCK_LLM=true`
+1. Make sure to get an api key from [CoHere](https://cohere.com/) & update .env File - if you choose not to configure in .env the `MOCK_SEMANTIC_SIMILARITY=true`
 2. Open 2 terminals and make sure to follow this procedure's pattern:
    tab 1:
 

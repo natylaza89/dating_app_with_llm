@@ -18,7 +18,7 @@ class StateManager:
 
     def set_user(self, user_id: UserID, user: User) -> None:
         self._users[user_id] = user
-        if not settings.mock_llm:
+        if not settings.mock_semantic_similarity:
             self.set_user_embeddings(
                 user.id,
                 embedding=get_embeddings(text=user.description)

@@ -15,10 +15,10 @@ class Settings(BaseSettings):
     )
 
     app_env: str = Field(default="dev")
-    project_name: str = "dating-app"
+    project_name: str = "semantic-similarity-dating-app"
     api_v1_str: str = "/api/v1"
     app_string: str = "app.main:app"
-    mock_llm: bool = Field(default=False)
+    mock_semantic_similarity: bool = Field(default=False)
     cohere_api_key: str = Field(default="")
 
     @property
@@ -31,7 +31,7 @@ class Settings(BaseSettings):
 
     def model_post_init(self, __context) -> None:
         load_dotenv()
-        self.mock_llm = os.environ.get("MOCK_LLM", "").lower() in {"True", "true"}
+        self.mock_semantic_similarity = os.environ.get("MOCK_SEMANTIC_SIMILARITY", "").lower() in {"True", "true"}
         self.cohere_api_key = os.environ.get("COHERE_API_KEY", "")
         
 
