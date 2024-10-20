@@ -9,43 +9,64 @@ on:
     paths:
       - "backend/app/**"
       - "backend/tests/**"
-
+# TODO: make a reusbale step for setup
 jobs:
-  setup-dependencies:
-    uses: ./.github/workflows/setup-dependencies.yml
-
   lint:
-    needs: setup-dependencies
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: ./.github/workflows/setup-dependencies.yml
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.12"
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+      - name: Install dependencies
+        run: |
+          cd backend
+          poetry env use 3.12
+          poetry install
       - name: Run Ruff
         run: |
           cd backend
-          poetry shell
           poetry run ruff check app tests
 
   type-check:
-    needs: setup-dependencies
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: ./.github/workflows/setup-dependencies.yml
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.12"
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+      - name: Install dependencies
+        run: |
+          cd backend
+          poetry env use 3.12
+          poetry install
       - name: Run Mypy
         run: |
           cd backend
-          poetry shell
           poetry run mypy app tests
 
   test:
-    needs: setup-dependencies
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: ./.github/workflows/setup-dependencies.yml
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.12"
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+      - name: Install dependencies
+        run: |
+          cd backend
+          poetry env use 3.12
+          poetry install
       - name: Run Pytest
         run: |
           cd backend
-          poetry shell
           poetry run pytest tests
