@@ -11,44 +11,41 @@ on:
       - "backend/tests/**"
 
 jobs:
-  setup:
+  setup-dependencies:
     uses: ./.github/workflows/setup-dependencies.yml
 
   lint:
-    needs: setup
+    needs: setup-dependencies
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/cache@v3
-        with:
-          path: ${{ github.workspace }}
-          key: ${{ runner.os }}-workspace-${{ github.sha }}
+      - uses: actions/checkout@v3
+      - uses: ./.github/workflows/setup-dependencies.yml
       - name: Run Ruff
         run: |
           cd backend
+          poetry shell
           poetry run ruff check app tests
 
   type-check:
-    needs: setup
+    needs: setup-dependencies
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/cache@v3
-        with:
-          path: ${{ github.workspace }}
-          key: ${{ runner.os }}-workspace-${{ github.sha }}
+      - uses: actions/checkout@v3
+      - uses: ./.github/workflows/setup-dependencies.yml
       - name: Run Mypy
         run: |
           cd backend
+          poetry shell
           poetry run mypy app tests
 
   test:
-    needs: setup
+    needs: setup-dependencies
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/cache@v3
-        with:
-          path: ${{ github.workspace }}
-          key: ${{ runner.os }}-workspace-${{ github.sha }}
+      - uses: actions/checkout@v3
+      - uses: ./.github/workflows/setup-dependencies.yml
       - name: Run Pytest
         run: |
           cd backend
+          poetry shell
           poetry run pytest tests
